@@ -1,1 +1,1 @@
-# MINIM1_DSA
+He tenido problemas con la función de find Peticion donde busco una petición mediante su longitud y su latitud, nunca la encontraba, y en el servis hay bastantes funciones donde me sale que los datos que le introduzco esta en un tipo de contenido incorrecto
