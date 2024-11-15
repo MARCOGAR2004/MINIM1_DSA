@@ -8,11 +8,14 @@ import edu.upc.dsa.models.ElementType;
 import edu.upc.dsa.models.PuntoInteres;
 
 public interface JuegoManager {
+
+
     public Usuario addUsuario(String nombre, String apellido, String correo, String fecha);
     public List<Usuario> UsuariosOrdenados();
     public Usuario infoUsuario(String id);
     public PuntoInteres addPunto(int longitud, int latitud, ElementType tipo);
     public List<PuntoInteres> listaPuntosDeUsuario(String id);
+    public PuntoInteres findPunto(int longitud, int latitud);
     public List<Usuario> listaUsuariosDePunto(int longitud, int latitud);
     public RegistroUsuarioPunto Registrar(String idUsuario, int longitud, int latitud);
     public int sizeUsuarios();

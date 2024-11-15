@@ -26,7 +26,7 @@ public class JuegoService {
     public JuegoService() {
         this.jm = JuegoManagerImpl.getInstance();
         if (jm.sizeUsuarios() == 0) {
-            this.jm.addUsuario("Juan", "Perez", "juan.perez.upc.edu", "2020-05-01");
+            this.jm.addUsuarioId("1", "Juan", "Perez", "juan.perez.upc.edu", "2020-05-01");
             this.jm.addUsuario("Marco", "Garrido", "marco.garrido.upc.edu", "2010-11-01");
             this.jm.addUsuario("Pedro", "Garcia", "pedro.garcia.upc.edu", "2015-04-02");
         }
@@ -34,6 +34,11 @@ public class JuegoService {
             this.jm.addPunto(10, 20, ElementType.DOOR);
             this.jm.addPunto(20, 30, ElementType.WALL);
             this.jm.addPunto(30, 40, ElementType.BRIDGE);
+        }
+        if (jm.sizeRegistros() == 0) {
+            this.jm.Registrar("1", 10, 20);
+            this.jm.Registrar("1", 20, 30);
+            this.jm.Registrar("1", 30, 40);
         }
     }
     @GET
@@ -92,15 +97,14 @@ public class JuegoService {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response newPunto(PuntoInteres p) {
 
-        if (p.getTipo()==null)
+        if(p.getTipo()==null)
         {
             return Response.status(500).entity(p).build();
+
         }
-        else
-        {
             this.jm.addPunto(p.getLongitud(), p.getLatitud(), p.getTipo());
             return Response.status(201).entity(p).build();
-        }
+
 
     }
 
@@ -108,42 +112,59 @@ public class JuegoService {
     @ApiOperation(value = "add a new registro", notes = "asdasd")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Successful", response= RegistroUsuarioPunto.class),
-            @ApiResponse(code = 500, message = "Validation Error")
+            @ApiResponse(code = 500, message = "Validation Error"),
+            @ApiResponse(code = 404, message = "User or Point Not Found")
     })
     @Path("/registro")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response newRegistro(RegistroUsuarioPunto r) {
 
         if (r.getIdUsuario() == null) {
-            return Response.status(500).entity(r).build();
-        } else {
+            return Response.status(500).entity("Validation error").build();
+        }
+        else if (this.jm.infoUsuario(r.getIdUsuario()) == null || this.jm.findPunto(r.getLongitud(), r.getLatitud()) == null) {
+            return Response.status(404).entity("User or Point Not Found").build();
+        }
+        else {
             this.jm.Registrar(r.getIdUsuario(), r.getLongitud(), r.getLatitud());
             return Response.status(201).entity(r).build();
         }
     }
+
+
     @GET
     @ApiOperation(value = "get Puntos de Usuario", notes = "asdasd")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Successful", response = PuntoInteres.class, responseContainer="List"),
     })
-    @Path("/puntos/id")
+    @Path("/puntos/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPuntosDeUsuario(@PathParam("id") String id) {
-        List<PuntoInteres> puntos = this.jm.listaPuntosDeUsuario(id);
-        GenericEntity<List<PuntoInteres>> entity = new GenericEntity<List<PuntoInteres>>(puntos) {};
+        List<PuntoInteres> puntosU = this.jm.listaPuntosDeUsuario(id);
+        GenericEntity<List<PuntoInteres>> entity = new GenericEntity<List<PuntoInteres>>(puntosU) {};
         return Response.status(201).entity(entity).build();
     }
+
+
     @GET
     @ApiOperation(value = "get Usuarios de Punto", notes = "asdasd")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Successful", response = Usuario.class, responseContainer="List"),
+            @ApiResponse(code = 500, message = "Validation Error"),
+            @ApiResponse(code = 404, message = "Point not Found")
     })
-    @Path("/registro/usuario")
+    @Path("/registro/usuario/{longitud}/{latitud}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUsuariosDePunto(@PathParam("longitud") int longitud, @PathParam("latitud") int latitud) {
-        List<Usuario> usuarios = this.jm.listaUsuariosDePunto(longitud, latitud);
-        GenericEntity<List<Usuario>> entity = new GenericEntity<List<Usuario>>(usuarios) {};
-        return Response.status(201).entity(entity).build();
+        PuntoInteres p = this.jm.findPunto(longitud, latitud);
+        if (p == null) {
+            return Response.status(404).entity("Point not Found").build();
+        }
+        else {
+            List<Usuario> usuarios = this.jm.listaUsuariosDePunto(longitud, latitud);
+            GenericEntity<List<Usuario>> entity = new GenericEntity<List<Usuario>>(usuarios) {};
+            return Response.status(201).entity(entity).build();
+        }
     }
 
     @GET
@@ -153,7 +174,13 @@ public class JuegoService {
     })
     @Path("/puntos/tipo")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPuntosDeTipo(@PathParam("tipo") ElementType tipo) {
+    public Response getPuntosDeTipo(@QueryParam("tipo") ElementType tipo) {
+
+        if(tipo == null)
+        {
+            return Response.status(500).entity(tipo).build();
+
+        }
         List<PuntoInteres> puntos = this.jm.PuntosDeTipo(tipo);
         GenericEntity<List<PuntoInteres>> entity = new GenericEntity<List<PuntoInteres>>(puntos) {};
         return Response.status(201).entity(entity).build();

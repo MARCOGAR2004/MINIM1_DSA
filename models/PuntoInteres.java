@@ -6,11 +6,16 @@ public class PuntoInteres {
     int latitud;
     int longitud;
     ElementType tipo;
-    public PuntoInteres(int latitud, int longitud, ElementType tipo) {
-        this.latitud = latitud;
-        this.longitud = longitud;
-        this.tipo = tipo;
+
+    public PuntoInteres() {
     }
+    public PuntoInteres(int longitud, int latitud, ElementType tipo) {
+        this();
+        this.setLatitud(latitud);
+        this.setLongitud(longitud);
+        this.setTipo(tipo);
+    }
+
 
     public int getLatitud() {
         return latitud;

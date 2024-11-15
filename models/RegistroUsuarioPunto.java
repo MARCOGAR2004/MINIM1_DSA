@@ -8,10 +8,14 @@ public class RegistroUsuarioPunto {
     int longitud;
     int latitud;
 
+    public RegistroUsuarioPunto() {
+    }
+
     public RegistroUsuarioPunto(String idUsuario, int longitud, int latitud) {
-        this.idUsuario = idUsuario;
-        this.longitud = longitud;
-        this.latitud = latitud;
+        this();
+        this.setIdUsuario(idUsuario);
+        this.setLongitud(longitud);
+        this.setLatitud(latitud);
     }
 
     public String getIdUsuario() {

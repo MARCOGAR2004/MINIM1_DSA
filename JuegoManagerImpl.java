@@ -72,21 +72,21 @@ public class JuegoManagerImpl implements JuegoManager {
     @Override
     public RegistroUsuarioPunto Registrar (String idUsuario, int longitud, int latitud) {
         Usuario u = this.infoUsuario(idUsuario);
-        if (u == null) {
-            logger.warn("Usuario no encontrado con id: " + idUsuario);
-            return null;
-        }
         PuntoInteres p = this.findPunto(longitud, latitud);
-
-        if (p != null)
-        {
-            RegistroUsuarioPunto newRegistro = new RegistroUsuarioPunto(idUsuario, longitud, latitud);
-            return newRegistro;
+        if (u == null || p == null) {
+            logger.warn("Usuario no encontrado con id: " + idUsuario + " o Punto no encontrado con longitud=" + longitud + " y latitud=" + latitud);
+            return null;
         }
         else
-            return null;
-
+        {
+            RegistroUsuarioPunto Registro = new RegistroUsuarioPunto(idUsuario, longitud, latitud);
+            this.registros.add(Registro);
+            return Registro;
+        }
     }
+
+    @Override
+    //Encuentra un punto de interes mediante su longitud y latitud, y si no lo encuentra devuelve null
     public PuntoInteres findPunto(int longitud, int latitud) {
         logger.info("findPunto con parametros: longitud=" + longitud + ", latitud=" + latitud);
 
@@ -123,7 +123,7 @@ public class JuegoManagerImpl implements JuegoManager {
         }
 
     }
-    //Lista los puntos de interes por los que ha pasado un usuario mediant su id
+    //Lista los puntos de interes por los que ha pasado un usuario mediante su id
     @Override
     public List<PuntoInteres> listaPuntosDeUsuario(String id) {
         logger.info("listaPuntosDeUsuario con id: " + id);
@@ -144,6 +144,7 @@ public class JuegoManagerImpl implements JuegoManager {
             return puntosUsuario;
         }
     }
+    //Añade un nuevo usuario
     @Override
     public Usuario addUsuario(String nombre, String apellido, String correo, String fecha) {
         logger.info("addUsuario con parametros: nombre=" + nombre + ", apellido=" + apellido + ", correo=" + correo + ", fecha=" + fecha);
@@ -175,6 +176,7 @@ public class JuegoManagerImpl implements JuegoManager {
         this.registros.clear();
     }
 
+    //Añade un nuevo usuario con el id que queramos
     @Override
     public Usuario addUsuarioId(String id, String nombre, String apellido, String correo, String fecha) {
         logger.info("addUsuario con parametros: id=" + id + ", nombre=" + nombre + ", apellido=" + apellido + ", correo=" + correo + ", fecha=" + fecha);
@@ -192,6 +194,7 @@ public class JuegoManagerImpl implements JuegoManager {
 
         return ret;
     }
+    //Devuelve una lista de puntos de interes de un tipo concreto
     @Override
     public List<PuntoInteres> PuntosDeTipo(ElementType tipo) {
         logger.info("PuntosDeTipo con tipo: " + tipo);
